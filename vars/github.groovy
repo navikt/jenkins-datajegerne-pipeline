@@ -5,7 +5,7 @@ def generateAppToken() {
 
     withCredentials([file(credentialsId: 'datajegerne_key', variable: 'PRIVATE_KEY')]) {
         def jwtToken = sh(script: "$genJwtToken ${env.PRIVATE_KEY} $appId", returnStdout: true).trim()
-        def appToken = sh(script: "$genAppToken $jwtToken", returnStdout: true).trim()
+        def appToken = sh(script: "$genAppToken navikt $jwtToken", returnStdout: true).trim()
 
         return appToken
     }
