@@ -46,22 +46,23 @@ def jiraPost(final String callbackUrl, final String fasitEnv, final String nameS
     if (!nameSpace) {
         error 'Environment variable NAMESPACE must be specified'
     }
-
-    def postBody = [
-            fields: [
-                    project          : [key: "DEPLOY"],
-                    issuetype        : [id: "14302"],
-                    customfield_14811: [value: "${fasitEnv}"],
-                    customfield_14812: "${applicationName}:${applicationVersion}",
-                    customfield_17410: callbackUrl,
-                    customfield_19015: [id: "22707", value: "Yes"],
-                    customfield_19413: "${nameSpace}",
-                    customfield_19610: [value: "fss"],
-                    summary          : "Automatisk deploy av ${applicationName}:${applicationVersion} til ${fasitEnv} (${nameSpace} namespace)"
-            ]
-    ]
-    
-    return jiraPostRequest(postBody, fasitEnv)
+    withCredentials([usernamePassword(credentialsId: 'srvjirascript', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+        def postBody = [
+                fields: [
+                        project          : [key: "DEPLOY"],
+                        issuetype        : [id: "14302"],
+                        customfield_14811: [value: "${fasitEnv}"],
+                        customfield_14812: "${applicationName}:${applicationVersion}",
+                        customfield_17410: callbackUrl,
+                        customfield_19015: [id: "22707", value: "Yes"],
+                        customfield_19413: "${nameSpace}",
+                        customfield_19610: [value: "fss"],
+                        summary          : "Automatisk deploy av ${applicationName}:${applicationVersion} til ${fasitEnv} (${nameSpace} namespace)"
+                ]
+        ]
+        def base64encoded = "${env.USERNAME}:${env.PASSWORD}".bytes.encodeBase64().toString()
+        return jiraPostRequest(postBody, fasitEnv)
+    }
 }
 
 def jiraProdPost(final String jiraIssueId) {
@@ -103,7 +104,7 @@ def jiraPostRequest(final postBody, final String fasitEnv) {
     echo jiraPayload
     def response = httpRequest([
             url                   : "https://jira.adeo.no/rest/api/2/issue/",
-            authentication        : "JIRA",
+            customHeaders: [[name: "Authorization", value: "Basic ${base64encoded}"]],
             consoleLogResponseBody: true,
             contentType           : "APPLICATION_JSON",
             httpMode              : "POST",
