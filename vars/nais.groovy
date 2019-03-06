@@ -61,7 +61,7 @@ def jiraPost(final String callbackUrl, final String fasitEnv, final String nameS
                 ]
         ]
         def base64encoded = "${env.USERNAME}:${env.PASSWORD}".bytes.encodeBase64().toString()
-        return jiraPostRequest(postBody, fasitEnv)
+        return jiraPostRequest(postBody, fasitEnv, base64encoded)
     }
 }
 
@@ -99,12 +99,12 @@ def jiraPostRequest(final postBody) {
     return jiraPostRequest(postBody, env.FASIT_ENV)
 }
 
-def jiraPostRequest(final postBody, final String fasitEnv) {
+def jiraPostRequest(final postBody, final String fasitEnv, final String authentication) {
     def jiraPayload = JsonOutput.toJson(postBody)
     echo jiraPayload
     def response = httpRequest([
             url                   : "https://jira.adeo.no/rest/api/2/issue/",
-            customHeaders: [[name: "Authorization", value: "Basic ${base64encoded}"]],
+            customHeaders: [[name: "Authorization", value: "Basic ${authentication}"]],
             consoleLogResponseBody: true,
             contentType           : "APPLICATION_JSON",
             httpMode              : "POST",
