@@ -56,7 +56,7 @@ def jiraPost(final String callbackUrl, final String fasitEnv, final String nameS
                         customfield_17410: callbackUrl,
                         customfield_19015: [id: "22707", value: "Yes"],
                         customfield_19413: "${nameSpace}",
-                        customfield_19610: [value: "fss"],
+                        customfield_19610: [value: "iapp"],
                         summary          : "Automatisk deploy av ${applicationName}:${applicationVersion} til ${fasitEnv} (${nameSpace} namespace)"
                 ]
         ]
